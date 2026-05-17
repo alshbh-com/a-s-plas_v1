@@ -170,7 +170,11 @@ export default function CourierCollections() {
   const regularBonuses = bonuses.filter(b => !b.reason?.startsWith('__office_commission__'));
   const totalRegularBonuses = regularBonuses.reduce((sum, b) => sum + Number(b.amount), 0);
 
-  const netDue = totalCollection + totalOfficeCommission - commissionTotal - totalRegularBonuses;
+  const totalAdvances = advances.filter(a => a.type === 'advance').reduce((s, a) => s + Number(a.amount), 0);
+  const totalDeductions = advances.filter(a => a.type === 'deduction').reduce((s, a) => s + Number(a.amount), 0);
+  const totalExtra = advances.filter(a => a.type === 'bonus').reduce((s, a) => s + Number(a.amount), 0);
+  const netDue = totalCollection + totalOfficeCommission - commissionTotal - totalRegularBonuses
+    - courierSalary - totalExtra + totalAdvances + totalDeductions;
 
   const toggleStatus = (statusId: string) => {
     setCommissionStatuses(prev => prev.includes(statusId) ? prev.filter(s => s !== statusId) : [...prev, statusId]);
