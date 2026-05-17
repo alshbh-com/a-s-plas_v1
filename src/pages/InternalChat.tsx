@@ -154,7 +154,7 @@ export default function InternalChat() {
     const { data, error } = await supabase.from('messages' as any).insert({
       sender_id: user?.id,
       receiver_id: selectedContact,
-      message: newMessage.trim(),
+      content: newMessage.trim(),
     }).select().single();
 
     if (!error && data) {
