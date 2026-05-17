@@ -114,7 +114,7 @@ export default function CourierOrders() {
   const sendChatMsg = async () => {
     if (!chatMsg.trim() || !chatTarget || chatSending) return;
     setChatSending(true);
-    const { data } = await supabase.from('messages' as any).insert({ sender_id: user?.id, receiver_id: chatTarget, message: chatMsg.trim() }).select().single();
+    const { data } = await supabase.from('messages' as any).insert({ sender_id: user?.id, receiver_id: chatTarget, content: chatMsg.trim() }).select().single();
     if (data) { setChatMessages(prev => [...prev, data]); setChatMsg(''); loadChatContacts(); }
     setChatSending(false);
   };
