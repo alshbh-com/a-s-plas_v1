@@ -27,6 +27,8 @@ export default function CourierCollections() {
   const [orders, setOrders] = useState<any[]>([]);
   const [selectedOrders, setSelectedOrders] = useState<Set<string>>(new Set());
   const [bonuses, setBonuses] = useState<any[]>([]);
+  const [advances, setAdvances] = useState<any[]>([]);
+  const [courierSalary, setCourierSalary] = useState(0);
   const [bonusDialogOpen, setBonusDialogOpen] = useState(false);
   const [bonusType, setBonusType] = useState<'special' | 'office_commission'>('special');
   const [bonusAmount, setBonusAmount] = useState('');
