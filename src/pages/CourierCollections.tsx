@@ -322,6 +322,13 @@ export default function CourierCollections() {
             <Card className="bg-card border-border"><CardContent className="p-4 text-center"><p className="text-xs text-muted-foreground">صافي المستحق</p><p className="text-lg font-bold text-primary">{netDue} ج.م</p></CardContent></Card>
           </div>
 
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Card className="bg-card border-border"><CardContent className="p-3 text-center"><p className="text-xs text-muted-foreground">الراتب</p><p className="text-base font-bold text-sky-600">{courierSalary} ج.م</p></CardContent></Card>
+            <Card className="bg-card border-border"><CardContent className="p-3 text-center"><p className="text-xs text-muted-foreground">السلف</p><p className="text-base font-bold text-amber-600">{totalAdvances} ج.م</p></CardContent></Card>
+            <Card className="bg-card border-border"><CardContent className="p-3 text-center"><p className="text-xs text-muted-foreground">الخصومات</p><p className="text-base font-bold text-destructive">{totalDeductions} ج.م</p></CardContent></Card>
+            <Card className="bg-card border-border"><CardContent className="p-3 text-center"><p className="text-xs text-muted-foreground">إضافي</p><p className="text-base font-bold text-emerald-600">{totalExtra} ج.م</p></CardContent></Card>
+          </div>
+
           <Card className="bg-card border-border">
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="text-base">حاسبة العمولة</CardTitle>
