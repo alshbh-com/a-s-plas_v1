@@ -259,7 +259,7 @@ export default function InternalChat() {
                   return (
                     <div key={m.id} className={`flex ${isMine ? 'justify-start' : 'justify-end'}`}>
                       <div className={`max-w-[75%] rounded-lg px-3 py-2 text-sm ${isMine ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'}`}>
-                        <p>{m.message}</p>
+                        <p>{m.content}</p>
                         <div className={`flex items-center gap-1 mt-1 text-xs opacity-70 ${isMine ? 'justify-start' : 'justify-end'}`}>
                           <span>{new Date(m.created_at).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}</span>
                           {isMine && (m.is_read ? <CheckCheck className="h-3 w-3" /> : <Check className="h-3 w-3" />)}
