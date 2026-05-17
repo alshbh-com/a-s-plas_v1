@@ -1076,6 +1076,7 @@ export type Database = {
         }
         Returns: string
       }
+      user_office_id: { Args: { _user_id: string }; Returns: string }
     }
     Enums: {
       app_role: "owner" | "admin" | "courier" | "office"
