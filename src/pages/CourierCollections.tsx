@@ -101,6 +101,21 @@ export default function CourierCollections() {
       .eq('courier_id', selectedCourier)
       .order('created_at', { ascending: false });
     setBonuses(bonusData || []);
+
+    const { data: advData } = await supabase
+      .from('advances')
+      .select('*')
+      .eq('user_id', selectedCourier)
+      .eq('is_settled', false)
+      .order('created_at', { ascending: false });
+    setAdvances(advData || []);
+
+    const { data: prof } = await supabase
+      .from('profiles')
+      .select('salary')
+      .eq('id', selectedCourier)
+      .maybeSingle();
+    setCourierSalary(Number(prof?.salary || 0));
   };
 
   // Load closed orders for the selected courier on the selected date
