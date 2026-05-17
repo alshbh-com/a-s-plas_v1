@@ -27,6 +27,8 @@ export default function CourierCollections() {
   const [orders, setOrders] = useState<any[]>([]);
   const [selectedOrders, setSelectedOrders] = useState<Set<string>>(new Set());
   const [bonuses, setBonuses] = useState<any[]>([]);
+  const [advances, setAdvances] = useState<any[]>([]);
+  const [courierSalary, setCourierSalary] = useState(0);
   const [bonusDialogOpen, setBonusDialogOpen] = useState(false);
   const [bonusType, setBonusType] = useState<'special' | 'office_commission'>('special');
   const [bonusAmount, setBonusAmount] = useState('');
@@ -99,6 +101,21 @@ export default function CourierCollections() {
       .eq('courier_id', selectedCourier)
       .order('created_at', { ascending: false });
     setBonuses(bonusData || []);
+
+    const { data: advData } = await supabase
+      .from('advances')
+      .select('*')
+      .eq('user_id', selectedCourier)
+      .eq('is_settled', false)
+      .order('created_at', { ascending: false });
+    setAdvances(advData || []);
+
+    const { data: prof } = await supabase
+      .from('profiles')
+      .select('salary')
+      .eq('id', selectedCourier)
+      .maybeSingle();
+    setCourierSalary(Number(prof?.salary || 0));
   };
 
   // Load closed orders for the selected courier on the selected date
@@ -153,7 +170,11 @@ export default function CourierCollections() {
   const regularBonuses = bonuses.filter(b => !b.reason?.startsWith('__office_commission__'));
   const totalRegularBonuses = regularBonuses.reduce((sum, b) => sum + Number(b.amount), 0);
 
-  const netDue = totalCollection + totalOfficeCommission - commissionTotal - totalRegularBonuses;
+  const totalAdvances = advances.filter(a => a.type === 'advance').reduce((s, a) => s + Number(a.amount), 0);
+  const totalDeductions = advances.filter(a => a.type === 'deduction').reduce((s, a) => s + Number(a.amount), 0);
+  const totalExtra = advances.filter(a => a.type === 'bonus').reduce((s, a) => s + Number(a.amount), 0);
+  const netDue = totalCollection + totalOfficeCommission - commissionTotal - totalRegularBonuses
+    - courierSalary - totalExtra + totalAdvances + totalDeductions;
 
   const toggleStatus = (statusId: string) => {
     setCommissionStatuses(prev => prev.includes(statusId) ? prev.filter(s => s !== statusId) : [...prev, statusId]);
@@ -299,6 +320,13 @@ export default function CourierCollections() {
             <Card className="bg-card border-border"><CardContent className="p-4 text-center"><p className="text-xs text-muted-foreground">عمولة مكتب</p><p className="text-lg font-bold text-amber-500">{totalOfficeCommission} ج.م</p></CardContent></Card>
             <Card className="bg-card border-border"><CardContent className="p-4 text-center"><p className="text-xs text-muted-foreground">العمولة</p><p className="text-lg font-bold text-destructive">{commissionTotal} ج.م</p></CardContent></Card>
             <Card className="bg-card border-border"><CardContent className="p-4 text-center"><p className="text-xs text-muted-foreground">صافي المستحق</p><p className="text-lg font-bold text-primary">{netDue} ج.م</p></CardContent></Card>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Card className="bg-card border-border"><CardContent className="p-3 text-center"><p className="text-xs text-muted-foreground">الراتب</p><p className="text-base font-bold text-sky-600">{courierSalary} ج.م</p></CardContent></Card>
+            <Card className="bg-card border-border"><CardContent className="p-3 text-center"><p className="text-xs text-muted-foreground">السلف</p><p className="text-base font-bold text-amber-600">{totalAdvances} ج.م</p></CardContent></Card>
+            <Card className="bg-card border-border"><CardContent className="p-3 text-center"><p className="text-xs text-muted-foreground">الخصومات</p><p className="text-base font-bold text-destructive">{totalDeductions} ج.م</p></CardContent></Card>
+            <Card className="bg-card border-border"><CardContent className="p-3 text-center"><p className="text-xs text-muted-foreground">إضافي</p><p className="text-base font-bold text-emerald-600">{totalExtra} ج.م</p></CardContent></Card>
           </div>
 
           <Card className="bg-card border-border">

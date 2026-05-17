@@ -114,7 +114,7 @@ export default function CourierOrders() {
   const sendChatMsg = async () => {
     if (!chatMsg.trim() || !chatTarget || chatSending) return;
     setChatSending(true);
-    const { data } = await supabase.from('messages' as any).insert({ sender_id: user?.id, receiver_id: chatTarget, message: chatMsg.trim() }).select().single();
+    const { data } = await supabase.from('messages' as any).insert({ sender_id: user?.id, receiver_id: chatTarget, content: chatMsg.trim() }).select().single();
     if (data) { setChatMessages(prev => [...prev, data]); setChatMsg(''); loadChatContacts(); }
     setChatSending(false);
   };
@@ -569,7 +569,7 @@ export default function CourierOrders() {
                           ? 'bg-[hsl(142,60%,85%)] text-[hsl(142,70%,15%)] rounded-tl-none'
                           : 'bg-card text-card-foreground rounded-tr-none border border-border'
                       }`}>
-                        <p className="leading-relaxed">{m.message}</p>
+                        <p className="leading-relaxed">{m.content}</p>
                         <div className={`flex items-center gap-1 mt-0.5 text-[10px] opacity-50 ${isMine ? 'justify-end' : 'justify-start'}`}>
                           <span>{new Date(m.created_at).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}</span>
                           {isMine && (m.is_read

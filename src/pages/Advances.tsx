@@ -49,9 +49,9 @@ export default function Advances() {
     if (selectedEmployee) {
       loadAdvances();
       const emp = employees.find(e => e.id === selectedEmployee);
-      setSalary(String(emp?.salary || 0));
+      setSalary(String(emp?.salary ?? 0));
     }
-  }, [selectedEmployee]);
+  }, [selectedEmployee, employees]);
 
   const loadAdvances = async () => {
     const { data } = await supabase
