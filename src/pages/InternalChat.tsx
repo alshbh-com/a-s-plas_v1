@@ -105,7 +105,7 @@ export default function InternalChat() {
     (lastMsgs || []).forEach((m: any) => {
       const otherId = m.sender_id === user?.id ? m.receiver_id : m.sender_id;
       if (!lastMessageMap[otherId]) {
-        lastMessageMap[otherId] = { message: m.message, time: m.created_at };
+        lastMessageMap[otherId] = { message: m.content, time: m.created_at };
       }
     });
 
