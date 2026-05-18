@@ -276,7 +276,7 @@ export default function OfficeAccounts() {
       const ords = officeOrders.filter(o => o.status_id === status.id);
       const total = ords.reduce((sum, o) => sum + Number(o.price || 0), 0);
       const shipping = ords.reduce((sum, o) => sum + Number(o.delivery_price || 0), 0);
-      const net = total - shipping;
+      const net = calcNet(total, shipping);
       return {
         statusName: status.name,
         statusColor: status.color,
