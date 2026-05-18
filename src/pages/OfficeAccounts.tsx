@@ -32,6 +32,10 @@ export default function OfficeAccounts() {
   const [searchQuery, setSearchQuery] = useState('');
   const [courierCommissionRate, setCourierCommissionRate] = useState('');
   const [officeCommissionRate, setOfficeCommissionRate] = useState('');
+  // shipping mode: 'none' = السعر كما هو, 'add' = السعر + الشحن, 'subtract' = السعر - الشحن
+  const [shippingMode, setShippingMode] = useState<'none' | 'add' | 'subtract'>('none');
+  const calcNet = (price: number, shipping: number) =>
+    shippingMode === 'add' ? price + shipping : shippingMode === 'subtract' ? price - shipping : price;
 
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
 
@@ -272,7 +276,7 @@ export default function OfficeAccounts() {
       const ords = officeOrders.filter(o => o.status_id === status.id);
       const total = ords.reduce((sum, o) => sum + Number(o.price || 0), 0);
       const shipping = ords.reduce((sum, o) => sum + Number(o.delivery_price || 0), 0);
-      const net = total - shipping;
+      const net = calcNet(total, shipping);
       return {
         statusName: status.name,
         statusColor: status.color,
@@ -306,7 +310,7 @@ export default function OfficeAccounts() {
       'الشحن': Number(o.delivery_price || 0),
       'عمولة المندوب': courierRate,
       'عمولة المكتب': officeRate,
-      'الصافي': Number(o.price || 0) - Number(o.delivery_price || 0),
+      'الصافي': calcNet(Number(o.price || 0), Number(o.delivery_price || 0)),
       'الحالة': statusName(o.status_id),
       'المندوب': getCourierName(o.courier_id),
     }));
@@ -322,7 +326,7 @@ export default function OfficeAccounts() {
       'الشحن': filteredOrders.reduce((s, o) => s + Number(o.delivery_price || 0), 0),
       'عمولة المندوب': courierRate * filteredOrders.length,
       'عمولة المكتب': officeRate * filteredOrders.length,
-      'الصافي': filteredOrders.reduce((s, o) => s + Number(o.price || 0) - Number(o.delivery_price || 0), 0),
+      'الصافي': filteredOrders.reduce((s, o) => s + calcNet(Number(o.price || 0), Number(o.delivery_price || 0)), 0),
       'الحالة': '',
       'المندوب': '',
     });
@@ -349,7 +353,7 @@ export default function OfficeAccounts() {
       <td>${Number(o.delivery_price || 0)}</td>
       <td>${courierRate}</td>
       <td>${officeRate}</td>
-      <td>${Number(o.price || 0) - Number(o.delivery_price || 0)}</td>
+      <td>${calcNet(Number(o.price || 0), Number(o.delivery_price || 0))}</td>
       <td>${statusName(o.status_id)}</td>
       <td>${getCourierName(o.courier_id)}</td>
       <td style="text-align:center;font-weight:bold;color:#16a34a">✅ خالص</td>
@@ -357,7 +361,7 @@ export default function OfficeAccounts() {
 
     const totalPrice = filteredOrders.reduce((s, o) => s + Number(o.price || 0), 0);
     const totalShipping = filteredOrders.reduce((s, o) => s + Number(o.delivery_price || 0), 0);
-    const totalNet = totalPrice - totalShipping;
+    const totalNet = filteredOrders.reduce((s, o) => s + calcNet(Number(o.price || 0), Number(o.delivery_price || 0)), 0);
     const settledCount = filteredOrders.length; // PDF شامل: كل الأوردرات تظهر كخالص تلقائياً
 
     w.document.write(`<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8">
@@ -530,6 +534,17 @@ export default function OfficeAccounts() {
                   placeholder="0"
                 />
               </div>
+              <div className="space-y-1">
+                <Label className="text-xs">حساب الصافي</Label>
+                <Select value={shippingMode} onValueChange={(v: any) => setShippingMode(v)}>
+                  <SelectTrigger className="w-44 bg-secondary border-border"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">السعر كما هو (بدون شحن)</SelectItem>
+                    <SelectItem value="add">السعر + الشحن</SelectItem>
+                    <SelectItem value="subtract">السعر - الشحن</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -673,7 +688,7 @@ export default function OfficeAccounts() {
                     const status = statuses.find(s => s.id === o.status_id);
                     const price = Number(o.price || 0);
                     const shipping = Number(o.delivery_price || 0);
-                    const net = price - shipping;
+                    const net = calcNet(price, shipping);
                     const createdDate = o.created_at ? new Date(o.created_at).toLocaleDateString('ar-EG') : '-';
                     return (
                       <TableRow key={o.id} className="border-border">
