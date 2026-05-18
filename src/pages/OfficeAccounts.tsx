@@ -534,6 +534,17 @@ export default function OfficeAccounts() {
                   placeholder="0"
                 />
               </div>
+              <div className="space-y-1">
+                <Label className="text-xs">حساب الصافي</Label>
+                <Select value={shippingMode} onValueChange={(v: any) => setShippingMode(v)}>
+                  <SelectTrigger className="w-44 bg-secondary border-border"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">السعر كما هو (بدون شحن)</SelectItem>
+                    <SelectItem value="add">السعر + الشحن</SelectItem>
+                    <SelectItem value="subtract">السعر - الشحن</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </CardContent>
         </Card>
