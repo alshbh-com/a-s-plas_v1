@@ -32,6 +32,10 @@ export default function OfficeAccounts() {
   const [searchQuery, setSearchQuery] = useState('');
   const [courierCommissionRate, setCourierCommissionRate] = useState('');
   const [officeCommissionRate, setOfficeCommissionRate] = useState('');
+  // shipping mode: 'none' = السعر كما هو, 'add' = السعر + الشحن, 'subtract' = السعر - الشحن
+  const [shippingMode, setShippingMode] = useState<'none' | 'add' | 'subtract'>('none');
+  const calcNet = (price: number, shipping: number) =>
+    shippingMode === 'add' ? price + shipping : shippingMode === 'subtract' ? price - shipping : price;
 
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
 
