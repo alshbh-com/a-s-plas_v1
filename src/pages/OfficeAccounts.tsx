@@ -677,7 +677,7 @@ export default function OfficeAccounts() {
                     const status = statuses.find(s => s.id === o.status_id);
                     const price = Number(o.price || 0);
                     const shipping = Number(o.delivery_price || 0);
-                    const net = price - shipping;
+                    const net = calcNet(price, shipping);
                     const createdDate = o.created_at ? new Date(o.created_at).toLocaleDateString('ar-EG') : '-';
                     return (
                       <TableRow key={o.id} className="border-border">
