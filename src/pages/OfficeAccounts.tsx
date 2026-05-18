@@ -361,7 +361,7 @@ export default function OfficeAccounts() {
 
     const totalPrice = filteredOrders.reduce((s, o) => s + Number(o.price || 0), 0);
     const totalShipping = filteredOrders.reduce((s, o) => s + Number(o.delivery_price || 0), 0);
-    const totalNet = totalPrice - totalShipping;
+    const totalNet = filteredOrders.reduce((s, o) => s + calcNet(Number(o.price || 0), Number(o.delivery_price || 0)), 0);
     const settledCount = filteredOrders.length; // PDF شامل: كل الأوردرات تظهر كخالص تلقائياً
 
     w.document.write(`<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8">
