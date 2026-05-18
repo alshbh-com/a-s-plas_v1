@@ -310,7 +310,7 @@ export default function OfficeAccounts() {
       'الشحن': Number(o.delivery_price || 0),
       'عمولة المندوب': courierRate,
       'عمولة المكتب': officeRate,
-      'الصافي': Number(o.price || 0) - Number(o.delivery_price || 0),
+      'الصافي': calcNet(Number(o.price || 0), Number(o.delivery_price || 0)),
       'الحالة': statusName(o.status_id),
       'المندوب': getCourierName(o.courier_id),
     }));
