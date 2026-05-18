@@ -353,7 +353,7 @@ export default function OfficeAccounts() {
       <td>${Number(o.delivery_price || 0)}</td>
       <td>${courierRate}</td>
       <td>${officeRate}</td>
-      <td>${Number(o.price || 0) - Number(o.delivery_price || 0)}</td>
+      <td>${calcNet(Number(o.price || 0), Number(o.delivery_price || 0))}</td>
       <td>${statusName(o.status_id)}</td>
       <td>${getCourierName(o.courier_id)}</td>
       <td style="text-align:center;font-weight:bold;color:#16a34a">✅ خالص</td>
