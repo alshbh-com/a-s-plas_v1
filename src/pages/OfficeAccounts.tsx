@@ -326,7 +326,7 @@ export default function OfficeAccounts() {
       'الشحن': filteredOrders.reduce((s, o) => s + Number(o.delivery_price || 0), 0),
       'عمولة المندوب': courierRate * filteredOrders.length,
       'عمولة المكتب': officeRate * filteredOrders.length,
-      'الصافي': filteredOrders.reduce((s, o) => s + Number(o.price || 0) - Number(o.delivery_price || 0), 0),
+      'الصافي': filteredOrders.reduce((s, o) => s + calcNet(Number(o.price || 0), Number(o.delivery_price || 0)), 0),
       'الحالة': '',
       'المندوب': '',
     });
