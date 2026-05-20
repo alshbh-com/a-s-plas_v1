@@ -145,18 +145,25 @@ export default function OfficeAccounts() {
       const partialManual = officePayments.filter(p => p.type === 'partial_delivery').reduce((sum, p) => sum + Number(p.amount), 0);
 
       const deliveredTotal = orders.filter(o => o.status_id === deliveredStatus?.id).reduce((sum, o) => sum + Number(o.price), 0);
-      const returnedTotal = orders.filter(o => returnStatusIds.includes(o.status_id)).reduce((sum, o) => sum + Number(o.price), 0);
+      // المرتجعات: عدد فقط (بدون فلوس) — البضاعة بترجع للمكتب ومش بتأثر على الصافي
+      const returnedCount = orders.filter(o => returnStatusIds.includes(o.status_id)).length;
+      const returnedTotal = 0;
       const postponedTotal = orders.filter(o => o.status_id === postponedStatus?.id).reduce((sum, o) => sum + Number(o.price), 0);
+      // التسليم الجزئي: المبلغ المحصّل من العميل (partial_amount) يتضاف للصافي تلقائياً
       const partialCourierCollected = orders.filter(o => o.status_id === partialStatus?.id).reduce((sum, o) => sum + Number(o.partial_amount || 0), 0);
 
-      const settlement = (deliveredTotal + partialManual) - (advancePaid + returnedTotal + shippingDiscount + commission);
+      // الصافي = (التسليم + التسليم الجزئي اليدوي + التسليم الجزئي التلقائي) - (المدفوع + خصم الشحن + العمولة)
+      // المرتجعات مستبعدة تماماً من الحساب
+      const settlement = (deliveredTotal + partialManual + partialCourierCollected) - (advancePaid + shippingDiscount + commission);
       const settlementWithPostponed = settlement + postponedTotal;
 
       return {
         id: office.id,
         name: office.name,
         orderCount: orders.length,
+        deliveredCount: orders.filter(o => o.status_id === deliveredStatus?.id).length,
         deliveredTotal,
+        returnedCount,
         returnedTotal,
         postponedTotal,
         partialManual,
@@ -619,11 +626,12 @@ export default function OfficeAccounts() {
                 <TableRow className="border-border">
                   <TableHead className="text-right">المكتب</TableHead>
                   <TableHead className="text-right">عدد</TableHead>
-                  <TableHead className="text-right">تسليم</TableHead>
-                  <TableHead className="text-right">مرتجع</TableHead>
+                  <TableHead className="text-right">تم التسليم (عدد)</TableHead>
+                  <TableHead className="text-right">تسليم (فلوس)</TableHead>
+                  <TableHead className="text-right">مرتجع (عدد فقط)</TableHead>
                   <TableHead className="text-right">مؤجل</TableHead>
                   <TableHead className="text-right hidden sm:table-cell">تسليم جزئي (يدوي)</TableHead>
-                  <TableHead className="text-right hidden sm:table-cell">تحصيل جزئي مندوب</TableHead>
+                  <TableHead className="text-right hidden sm:table-cell">تسليم جزئي (تلقائي)</TableHead>
                   <TableHead className="text-right hidden sm:table-cell">خصم شحن</TableHead>
                   <TableHead className="text-right">المدفوع</TableHead>
                   <TableHead className="text-right">العمولة</TableHead>
@@ -633,16 +641,17 @@ export default function OfficeAccounts() {
               </TableHeader>
               <TableBody>
                 {accounts.length === 0 ? (
-                  <TableRow><TableCell colSpan={12} className="text-center text-muted-foreground py-8">لا توجد بيانات</TableCell></TableRow>
+                  <TableRow><TableCell colSpan={13} className="text-center text-muted-foreground py-8">لا توجد بيانات</TableCell></TableRow>
                 ) : accounts.map(a => (
                   <TableRow key={a.id} className="border-border">
                     <TableCell className="font-medium text-sm">{a.name}</TableCell>
                     <TableCell className="text-sm">{a.orderCount}</TableCell>
-                    <TableCell className="font-bold text-sm">{a.deliveredTotal} ج.م</TableCell>
-                    <TableCell className="font-bold text-sm">{a.returnedTotal} ج.م</TableCell>
+                    <TableCell className="font-bold text-sm text-emerald-600">{a.deliveredCount}</TableCell>
+                    <TableCell className="font-bold text-sm text-emerald-600">{a.deliveredTotal} ج.م</TableCell>
+                    <TableCell className="font-bold text-sm text-rose-600">{a.returnedCount}</TableCell>
                     <TableCell className="font-bold text-sm">{a.postponedTotal} ج.م</TableCell>
                     <TableCell className="font-bold text-sm hidden sm:table-cell">{a.partialManual} ج.م</TableCell>
-                    <TableCell className="font-bold text-sm hidden sm:table-cell">{a.partialCourierCollected} ج.م</TableCell>
+                    <TableCell className="font-bold text-sm hidden sm:table-cell text-primary">{a.partialCourierCollected} ج.م</TableCell>
                     <TableCell className="text-sm hidden sm:table-cell">{a.shippingDiscount} ج.م</TableCell>
                     <TableCell className="font-bold text-sm">{a.advancePaid} ج.م</TableCell>
                     <TableCell className="text-sm font-bold">{a.commission} ج.م</TableCell>
