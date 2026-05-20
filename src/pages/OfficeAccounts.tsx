@@ -145,11 +145,16 @@ export default function OfficeAccounts() {
       const partialManual = officePayments.filter(p => p.type === 'partial_delivery').reduce((sum, p) => sum + Number(p.amount), 0);
 
       const deliveredTotal = orders.filter(o => o.status_id === deliveredStatus?.id).reduce((sum, o) => sum + Number(o.price), 0);
-      const returnedTotal = orders.filter(o => returnStatusIds.includes(o.status_id)).reduce((sum, o) => sum + Number(o.price), 0);
+      // المرتجعات: عدد فقط (بدون فلوس) — البضاعة بترجع للمكتب ومش بتأثر على الصافي
+      const returnedCount = orders.filter(o => returnStatusIds.includes(o.status_id)).length;
+      const returnedTotal = 0;
       const postponedTotal = orders.filter(o => o.status_id === postponedStatus?.id).reduce((sum, o) => sum + Number(o.price), 0);
+      // التسليم الجزئي: المبلغ المحصّل من العميل (partial_amount) يتضاف للصافي تلقائياً
       const partialCourierCollected = orders.filter(o => o.status_id === partialStatus?.id).reduce((sum, o) => sum + Number(o.partial_amount || 0), 0);
 
-      const settlement = (deliveredTotal + partialManual) - (advancePaid + returnedTotal + shippingDiscount + commission);
+      // الصافي = (التسليم + التسليم الجزئي اليدوي + التسليم الجزئي التلقائي) - (المدفوع + خصم الشحن + العمولة)
+      // المرتجعات مستبعدة تماماً من الحساب
+      const settlement = (deliveredTotal + partialManual + partialCourierCollected) - (advancePaid + shippingDiscount + commission);
       const settlementWithPostponed = settlement + postponedTotal;
 
       return {
